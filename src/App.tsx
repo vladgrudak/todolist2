@@ -9,7 +9,7 @@ export type Task = {
     isDone: boolean
 }
 
-export type TaskStatus = 'All' | 'Active' | 'Completed'
+export type Filter = 'All' | 'Active' | 'Completed'
 
 export const App = () => {
 
@@ -24,7 +24,7 @@ export const App = () => {
         setTasks(filteredTasks)
     }
 
-    const [filter, setFilter] = useState<TaskStatus>('All')
+    const [filter, setFilter] = useState<Filter>('All')
 
     let filteredTasks = tasks
 
@@ -35,13 +35,18 @@ export const App = () => {
         filteredTasks = tasks.filter(task => task.isDone)
     }
 
-    const filterTask = (taskStatus: TaskStatus) => {
+    const filterTask = (taskStatus: Filter) => {
         setFilter(taskStatus)
     }
 
     const createTask = (taskName: string) => {
         const newTask = {id: v1(), title: taskName, isDone: false}
         setTasks([newTask, ...tasks])
+    }
+
+    const changeTaskStatus = (taskId: string, isDone: boolean) => {
+        const newTasks = tasks.map(task => task.id === taskId ? {...task, isDone} : task)
+        setTasks(newTasks)
     }
 
 
@@ -53,6 +58,8 @@ export const App = () => {
                 deleteTask={deleteTask}
                 filterTask={filterTask}
                 createTask={createTask}
+                changeTaskStatus={changeTaskStatus}
+                currentFilter={filter}
             />
         </div>
     )

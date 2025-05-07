@@ -1,30 +1,30 @@
-import {Filter, Task} from './App.tsx';
+import {Filter, Task, Todolist} from './App.tsx';
 import {Button} from './Button.tsx';
 import {ChangeEvent, KeyboardEvent, useState} from 'react';
 
 type Props = {
-    title: string,
     tasks: Task[],
     date?: string,
-    deleteTask: (tasks: Task[], taskId: string) => void,
-    filterTask: (filter: Filter) => void,
-    createTask: (taskName: string) => void,
-    changeTaskStatus: (taskId: string, isDone: boolean) => void,
-    currentFilter: Filter,
+    deleteTask: (todolistId: string, taskId: string) => void,
+    filterTask: (todolistId: string, filter: Filter) => void,
+    createTask: (todolistId: string, taskName: string) => void,
+    changeTaskStatus: (todolistId: string, taskId: string, isDone: boolean) => void,
+    todolist: Todolist,
+    deleteTodolist: (todolistId: string) => void
 }
 
-export const TodolistItem = ({title, tasks, deleteTask, filterTask, createTask, changeTaskStatus, currentFilter}: Props) => {
+export const TodolistItem = ({todolist, deleteTodolist, tasks, deleteTask, filterTask, createTask, changeTaskStatus}: Props) => {
     const [taskTitle, setTaskTitle] = useState('');
     const [error, setError] = useState<string|null>(null)
 
     const tasksList = tasks.map(task => {
 
         const deleteTaskHandler = () => {
-            deleteTask(tasks, task.id)
+            deleteTask(todolist.id, task.id)
         }
 
         const changeTaskStatusHandler = (e: ChangeEvent<HTMLInputElement>) => {
-            changeTaskStatus(task.id,  e.currentTarget.checked)
+            changeTaskStatus(todolist.id, task.id,  e.currentTarget.checked)
         }
 
         return (
@@ -39,7 +39,7 @@ export const TodolistItem = ({title, tasks, deleteTask, filterTask, createTask, 
     const createTaskHandler = () => {
         const trimmedTitle = taskTitle.trim()
         if (trimmedTitle !== '') {
-            createTask(trimmedTitle)
+            createTask(todolist.id, trimmedTitle)
             setTaskTitle('')
         } else {
             setError('Your input is empty')
@@ -58,9 +58,20 @@ export const TodolistItem = ({title, tasks, deleteTask, filterTask, createTask, 
         }
     }
 
+    const changeFilterHandler = (filter: Filter) => {
+        filterTask(todolist.id, filter)
+    }
+
+    const deleteTodolistHandler = () => {
+        deleteTodolist(todolist.id)
+    }
+
     return (
         <div>
-            <h3>{title}</h3>
+            <div className="container">
+                <h3>{todolist.title}</h3>
+                <Button onClick={deleteTodolistHandler} title={'X'}></Button>
+            </div>
             <div>
                 <input
                     className={error ? 'error' : ''}
@@ -81,17 +92,17 @@ export const TodolistItem = ({title, tasks, deleteTask, filterTask, createTask, 
             }
             <div>
                 <Button
-                    className={currentFilter === 'All' ? 'active-filter' : ''}
+                    className={todolist.filter === 'All' ? 'active-filter' : ''}
                     title={'All'}
-                    onClick={() => filterTask('All')}/>
+                    onClick={() => changeFilterHandler('All')}/>
                 <Button
-                    className={currentFilter === 'Active' ? 'active-filter' : ''}
+                    className={todolist.filter === 'Active' ? 'active-filter' : ''}
                     title={'Active'}
-                    onClick={() => filterTask('Active')}/>
+                    onClick={() => changeFilterHandler('Active')}/>
                 <Button
-                    className={currentFilter === 'Completed' ? 'active-filter' : ''}
+                    className={todolist.filter === 'Completed' ? 'active-filter' : ''}
                     title={'Completed'}
-                    onClick={() => filterTask('Completed')}/>
+                    onClick={() => changeFilterHandler('Completed')} />
             </div>
         </div>
     )

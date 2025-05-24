@@ -1,8 +1,7 @@
 import './App.css'
-import {TodolistItem} from './TodolistItem.tsx';
-import {useReducer, useState} from 'react';
-import {v1} from 'uuid';
-import {CreateItemForm} from './CreateItemForm.tsx';
+import {TodolistItem} from '../TodolistItem.tsx';
+import {useState} from 'react';
+import {CreateItemForm} from '../CreateItemForm.tsx';
 
 import AppBar from '@mui/material/AppBar'
 import Toolbar from '@mui/material/Toolbar'
@@ -11,8 +10,8 @@ import MenuIcon from '@mui/icons-material/Menu'
 import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
-import {containerSx} from './TodolistItem.styles.ts';
-import {NavButton} from './NavButton.ts';
+import {containerSx} from '../TodolistItem.styles.ts';
+import {NavButton} from '../NavButton.ts';
 
 import {createTheme, ThemeProvider} from '@mui/material/styles'
 
@@ -20,17 +19,15 @@ import Switch from '@mui/material/Switch'
 import CssBaseline from '@mui/material/CssBaseline'
 import {
     changeTodolistFilterAC,
-    changeTodolistTitleAC, createTodolistAC,
-    deleteTodolistAC,
-    todolistsReducer
-} from './model/todolists-reducer.ts';
-import {
-    changeTaskStatusAC,
-    changeTaskTitleAC,
-    createTaskAC,
-    deleteTaskAC,
-    tasksReducer
-} from './model/tasks-reducer.ts';
+    changeTodolistTitleAC,
+    createTodolistAC,
+    deleteTodolistAC
+} from '../model/todolists-reducer.ts';
+import {changeTaskStatusAC, changeTaskTitleAC, createTaskAC, deleteTaskAC} from '../model/tasks-reducer.ts';
+import {useAppDispatch} from '../common/hooks/useAppDispatch.ts';
+import {useAppSelector} from '../common/hooks/useAppSelector.ts';
+import {selectTodolists} from '../model/todolists-selector.ts';
+import {selectTasks} from '../model/tasks-selector.ts';
 
 type ThemeMode = 'dark' | 'light'
 
@@ -54,79 +51,38 @@ export type Filter = 'All' | 'Active' | 'Completed'
 
 export const App = () => {
 
-    // BLL
-    const todolistId1 = v1()
-    const todolistId2 = v1()
-    // const [tasks, setTasks] = useState<TasksState>({
-    //     [todolistId1]: [
-    //         {id: v1(), title: 'HTML&CSS', isDone: true},
-    //         {id: v1(), title: 'JS', isDone: true},
-    //         {id: v1(), title: 'ReactJS', isDone: false},
-    //     ],
-    //     [todolistId2]: [
-    //         {id: v1(), title: 'Помыться', isDone: true},
-    //         {id: v1(), title: 'Побриться', isDone: true},
-    //         {id: v1(), title: 'Спать завалиться', isDone: false},
-    //     ]
-    // })
 
-    const initialTodolistsState: Todolist[] = [
-        {id: todolistId1, title: 'What to do', filter: 'All'},
-        {id: todolistId2, title: 'What to learn', filter: 'All'},
-    ]
+    const dispatch = useAppDispatch()
 
-    const initialTasksState: TasksState = {
-        [todolistId1]: [
-            {id: v1(), title: 'HTML&CSS', isDone: true},
-            {id: v1(), title: 'JS', isDone: true},
-            {id: v1(), title: 'ReactJS', isDone: false},
-        ],
-        [todolistId2]: [
-            {id: v1(), title: 'Помыться', isDone: true},
-            {id: v1(), title: 'Побриться', isDone: true},
-            {id: v1(), title: 'Спать завалиться', isDone: false},
-        ]
-    }
+    const todolists = useAppSelector(selectTodolists)
+    const tasks = useAppSelector(selectTasks)
 
-    // UseReducer
-    const [todolists, dispatchTodolists] = useReducer(todolistsReducer, initialTodolistsState)
-    const [tasks, dispatchTasks] = useReducer(tasksReducer, initialTasksState)
-    
     // CRUD tasks
     const createTask = (todolistId: string, taskName: string) => {
-        const action = createTaskAC({todolistId, title: taskName})
-        dispatchTasks(action)
+        dispatch(createTaskAC({todolistId, title: taskName}))
     }
     const deleteTask = (todolistId: string, taskId: string) => {
-        const action = deleteTaskAC({todolistId, taskId})
-        dispatchTasks(action)
+        dispatch(deleteTaskAC({todolistId, taskId}))
     }
     const changeTaskStatus = (todolistId: string, taskId: string, isDone: boolean) => {
-        const action = changeTaskStatusAC({todolistId, taskId, isDone})
-        dispatchTasks(action)
+        dispatch(changeTaskStatusAC({todolistId, taskId, isDone}))
     }
     const changeTaskTitle = (todolistId: string, title: string, taskId: string) => {
-        const action = changeTaskTitleAC({todolistId, taskId, title})
-        dispatchTasks(action)
+        dispatch(changeTaskTitleAC({todolistId, taskId, title}))
     }
 
     //CRUD todolist
     const changeFilter = (todolistId: string, filter: Filter) => {
-        dispatchTodolists(changeTodolistFilterAC({id: todolistId, filter}))
+        dispatch(changeTodolistFilterAC({id: todolistId, filter}))
     }
     const deleteTodolist = (todolistId: string) => {
-        const action = deleteTodolistAC(todolistId)
-        dispatchTodolists(action)
-        dispatchTasks(action)
+        dispatch(deleteTodolistAC({id: todolistId}))
     }
     const createTodolist = (title: string) => {
-        const action = createTodolistAC(title)
-        dispatchTodolists(action)
-        dispatchTasks(action)
-        // setTasks({...tasks, [action.payload.id]: []})
+        dispatch(createTodolistAC(title))
     }
     const changeTodolistTitle = (todolistId: string, title: string) => {
-        dispatchTodolists(changeTodolistTitleAC({id: todolistId, title}))
+        dispatch(changeTodolistTitleAC({id: todolistId, title}))
     }
    
     // UI (view)
@@ -168,9 +124,8 @@ export const App = () => {
                     </Grid>
                     <Grid container spacing={4}>
                         {todolists.map(todolist => {
-                            const todolistTasks = tasks[todolist.id]
+                            const todolistTasks: Task[] = tasks[todolist.id]
                             let filteredTasks = todolistTasks
-
                             if (todolist.filter === 'Active') {
                                 filteredTasks = todolistTasks.filter(task => !task.isDone)
                             } else if (todolist.filter === 'Completed') {

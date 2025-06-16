@@ -1,6 +1,5 @@
-import {RootState} from '../../../app/store.ts';
+import { RootState } from "@/app/store"
 
-import type {TasksState} from '@/features/todolists/model/tasks-reducer';
-
+import type { TasksState } from "@/features/todolists/model/tasks-reducer"
 
 export const selectTasks = (state: RootState): TasksState => state.tasks

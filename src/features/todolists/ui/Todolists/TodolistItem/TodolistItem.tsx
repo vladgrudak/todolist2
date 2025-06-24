@@ -1,6 +1,6 @@
 import { CreateItemForm } from "@/common/components/CreateItemForm/CreateItemForm"
-import { createTaskAC } from "@/features/todolists/model/tasks-reducer"
-import { type Todolist } from "@/features/todolists/model/todolists-reducer"
+import { createTaskAC } from "@/features/todolists/model/tasks-slice"
+import { type DomainTodolist } from "@/features/todolists/model/todolists-slice"
 import { useAppDispatch } from "@/common/hooks/useAppDispatch"
 import { TodolistTitle } from "@/features/todolists/ui/Todolists/TodolistItem/TodolistTitle/TodolistTitle"
 import { Tasks } from "@/features/todolists/ui/Todolists/TodolistItem/Tasks/Tasks"
@@ -8,7 +8,7 @@ import { FilterButtons } from "@/features/todolists/ui/Todolists/TodolistItem/Fi
 
 type Props = {
   date?: string
-  todolist: Todolist
+  todolist: DomainTodolist
 }
 
 export const TodolistItem = ({ todolist }: Props) => {

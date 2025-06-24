@@ -3,15 +3,15 @@ import {
   changeTodolistTitleAC,
   createTodolistAC,
   deleteTodolistAC,
-  type Todolist,
+  type DomainTodolist,
   todolistsReducer,
-} from "./todolists-reducer"
+} from "../todolists-slice"
 import { beforeEach, expect, test } from "vitest"
 import { nanoid } from "@reduxjs/toolkit"
 
 let todolistId1: string
 let todolistId2: string
-let startState: Todolist[]
+let startState: DomainTodolist[]
 
 beforeEach(() => {
   todolistId1 = nanoid()

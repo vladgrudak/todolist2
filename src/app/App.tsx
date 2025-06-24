@@ -1,7 +1,7 @@
 import { ThemeProvider } from "@mui/material/styles"
 import CssBaseline from "@mui/material/CssBaseline"
 import { useAppSelector } from "@/common/hooks"
-import { selectThemeMode } from "./app-selector"
+import { selectThemeMode } from "./app-slice"
 import { getTheme } from "@/common/theme"
 import { Header } from "@/common/components/Header/Header"
 import { Main } from "@/app/Main"

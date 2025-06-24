@@ -1,6 +1,6 @@
 import Button from "@mui/material/Button"
 import Box from "@mui/material/Box"
-import { changeTodolistFilterAC, type Filter } from "@/features/todolists/model/todolists-reducer"
+import { changeTodolistFilterAC, type Filter } from "@/features/todolists/model/todolists-slice"
 import { useAppDispatch } from "@/common/hooks/useAppDispatch"
 import { containerSx } from "@/common/styles"
 

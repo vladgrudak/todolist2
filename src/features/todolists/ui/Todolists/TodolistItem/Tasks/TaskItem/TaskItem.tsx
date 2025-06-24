@@ -1,4 +1,4 @@
-import { changeTaskStatusAC, changeTaskTitleAC, deleteTaskAC, Task } from "@/features/todolists/model/tasks-reducer"
+import { changeTaskStatusAC, changeTaskTitleAC, deleteTaskAC, Task } from "@/features/todolists/model/tasks-slice"
 import { ChangeEvent } from "react"
 import { Checkbox, ListItem } from "@mui/material"
 import { EditableSpan } from "@/common/components/EditableSpan/EditableSpan"

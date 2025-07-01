@@ -18,4 +18,7 @@ export const tasksApi = {
   changeTaskTitle({ todolistId, taskId, model }: { todolistId: string; taskId: string; model: UpdateTaskModel }) {
     return instance.put<BaseResponse<{ item: DomainTask }>>(`/todo-lists/${todolistId}/tasks/${taskId}`, model)
   },
+  updateTask({ task, model }: { task: DomainTask; model: UpdateTaskModel }) {
+    return instance.put<BaseResponse<{ item: DomainTask }>>(`/todo-lists/${task.todoListId}/tasks/${task.id}`, model)
+  },
 }

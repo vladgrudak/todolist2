@@ -5,14 +5,16 @@ import MenuIcon from "@mui/icons-material/Menu"
 import { NavButton } from "@/common/components/NavButton/NavButton"
 import Switch from "@mui/material/Switch"
 import AppBar from "@mui/material/AppBar"
-import { changeThemeModeAC } from "@/app/app-slice"
+import { changeThemeModeAC, selectStatus } from "@/app/app-slice"
 import { useAppSelector, useAppDispatch } from "@/common/hooks"
 import { selectThemeMode } from "@/app/app-slice"
 import { getTheme } from "@/common/theme"
 import { containerSx } from "@/common/styles"
+import { LinearProgress } from "@mui/material"
 
 export const Header = () => {
   const themeMode = useAppSelector(selectThemeMode)
+  const status = useAppSelector(selectStatus)
   const theme = getTheme(themeMode)
 
   const dispatch = useAppDispatch()
@@ -36,6 +38,7 @@ export const Header = () => {
           </div>
         </Container>
       </Toolbar>
+      {status === "loading" && <LinearProgress />}
     </AppBar>
   )
 }

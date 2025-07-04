@@ -5,6 +5,7 @@ import { useAppDispatch } from "@/common/hooks/useAppDispatch"
 import { TodolistTitle } from "@/features/todolists/ui/Todolists/TodolistItem/TodolistTitle/TodolistTitle"
 import { Tasks } from "@/features/todolists/ui/Todolists/TodolistItem/Tasks/Tasks"
 import { FilterButtons } from "@/features/todolists/ui/Todolists/TodolistItem/FilterButtons/FilterButtons"
+import styles from "./TodolistItem.module.css"
 
 type Props = {
   date?: string
@@ -19,9 +20,9 @@ export const TodolistItem = ({ todolist }: Props) => {
   }
 
   return (
-    <div>
-      <TodolistTitle id={todolist.id} title={todolist.title} />
-      <CreateItemForm onCreateItem={createTaskHandler} />
+    <div className={todolist.entityStatus === "loading" ? styles.disabled : ""}>
+      <TodolistTitle id={todolist.id} title={todolist.title} entityStatus={todolist.entityStatus} />
+      <CreateItemForm onCreateItem={createTaskHandler} isDisabled={todolist.entityStatus === "loading"} />
       <Tasks todolistId={todolist.id} filter={todolist.filter} />
       <FilterButtons todolistId={todolist.id} filter={todolist.filter} />
     </div>

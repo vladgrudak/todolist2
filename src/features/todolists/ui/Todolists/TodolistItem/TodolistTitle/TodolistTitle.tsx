@@ -4,13 +4,15 @@ import DeleteIcon from "@mui/icons-material/Delete"
 import { changeTodolistTitleTC, deleteTodolistTC } from "@/features/todolists/model/todolists-slice"
 import { useAppDispatch } from "@/common/hooks/useAppDispatch"
 import styles from "./TodolistTitle.module.css"
+import type { RequestStatus } from "@/common/types"
 
 type Props = {
   id: string
   title: string
+  entityStatus: RequestStatus
 }
 
-export const TodolistTitle = ({ id, title }: Props) => {
+export const TodolistTitle = ({ id, title, entityStatus }: Props) => {
   const dispatch = useAppDispatch()
 
   const deleteTodolistHandler = () => {
@@ -24,9 +26,10 @@ export const TodolistTitle = ({ id, title }: Props) => {
   return (
     <div className={styles.container}>
       <h3>
-        <EditableSpan value={title} onChange={changeTodolistTitleHandler} />
+        <EditableSpan value={title} onChange={changeTodolistTitleHandler} isDisabled={entityStatus === "loading"} />
       </h3>
-      <IconButton onClick={deleteTodolistHandler}>
+
+      <IconButton onClick={deleteTodolistHandler} disabled={entityStatus === "loading"}>
         <DeleteIcon />
       </IconButton>
     </div>

@@ -6,6 +6,7 @@ import { getTheme } from "@/common/theme"
 import { Header } from "@/common/components/Header/Header"
 import { Main } from "@/app/Main"
 import styles from "./App.module.css"
+import { ErrorSnackbar } from "@/common/components/ErrorSnackbar/ErrorSnackbar"
 
 export const App = () => {
   const themeMode = useAppSelector(selectThemeMode)
@@ -17,6 +18,7 @@ export const App = () => {
       <div className={styles.app}>
         <Header />
         <Main />
+        <ErrorSnackbar />
       </div>
     </ThemeProvider>
   )

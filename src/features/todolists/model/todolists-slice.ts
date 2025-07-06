@@ -3,6 +3,9 @@ import { todolistsApi } from "@/features/todolists/api/todolistsApi"
 import { createAppSlice } from "@/common/utils"
 import { changeStatusAC } from "@/app/app-slice"
 import type { RequestStatus } from "@/common/types"
+import { ResultCode } from "@/common/enums/enums"
+import { handleServerAppError } from "@/common/utils/handleServerAppError"
+import { handleServerNetworkError } from "@/common/utils/handleServerNetworkError"
 
 export const todolistsSlice = createAppSlice({
   name: "todolists",
@@ -36,15 +39,22 @@ export const todolistsSlice = createAppSlice({
       },
     ),
     createTodolistTC: create.asyncThunk(
-      async (title: string, thunkAPI) => {
+      async (title: string, { dispatch, rejectWithValue }) => {
         try {
-          thunkAPI.dispatch(changeStatusAC({ status: "loading" }))
+          dispatch(changeStatusAC({ status: "loading" }))
           const res = await todolistsApi.createTodolist({ title })
-          thunkAPI.dispatch(changeStatusAC({ status: "succeeded" }))
-          return res.data.data.item
+          dispatch(changeStatusAC({ status: "succeeded" }))
+
+          if (res.data.resultCode === ResultCode.Success) {
+            dispatch(changeStatusAC({ status: "succeeded" }))
+            return res.data.data.item
+          } else {
+            handleServerAppError({ dispatch, data: res.data })
+            return rejectWithValue(null)
+          }
         } catch (error) {
-          thunkAPI.dispatch(changeStatusAC({ status: "failed" }))
-          return thunkAPI.rejectWithValue(null)
+          handleServerNetworkError({ dispatch, error })
+          return rejectWithValue(null)
         }
       },
       {
@@ -54,15 +64,15 @@ export const todolistsSlice = createAppSlice({
       },
     ),
     changeTodolistTitleTC: create.asyncThunk(
-      async (payload: { id: string; title: string }, thunkAPI) => {
+      async (payload: { id: string; title: string }, { dispatch, rejectWithValue }) => {
         try {
-          thunkAPI.dispatch(changeStatusAC({ status: "loading" }))
+          dispatch(changeStatusAC({ status: "loading" }))
           await todolistsApi.changeTodolistTitle(payload)
-          thunkAPI.dispatch(changeStatusAC({ status: "succeeded" }))
+          dispatch(changeStatusAC({ status: "succeeded" }))
           return payload
         } catch (e) {
-          thunkAPI.dispatch(changeStatusAC({ status: "failed" }))
-          return thunkAPI.rejectWithValue(e)
+          dispatch(changeStatusAC({ status: "failed" }))
+          return rejectWithValue(e)
         }
       },
       {

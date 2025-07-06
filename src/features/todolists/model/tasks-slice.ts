@@ -2,8 +2,10 @@ import { createTodolistTC, deleteTodolistTC } from "./todolists-slice.ts"
 import { createAppSlice } from "@/common/utils"
 import { tasksApi } from "@/features/todolists/api/tasksApi"
 import type { DomainTask, UpdateTaskModel } from "@/features/todolists/api/tasksApi.types"
-import { changeErrorAC, changeStatusAC } from "@/app/app-slice"
+import { changeStatusAC } from "@/app/app-slice"
 import { ResultCode } from "@/common/enums/enums"
+import { handleServerNetworkError } from "@/common/utils/handleServerNetworkError"
+import { handleServerAppError } from "@/common/utils/handleServerAppError"
 
 export const tasksSlice = createAppSlice({
   name: "tasks",
@@ -41,12 +43,11 @@ export const tasksSlice = createAppSlice({
             dispatch(changeStatusAC({ status: "succeeded" }))
             return { task: res.data.data.item }
           } else {
-            dispatch(changeStatusAC({ status: "failed" }))
-            dispatch(changeErrorAC({ error: res.data.messages.length ? res.data.messages[0] : "Some error occurred." }))
+            handleServerAppError({ dispatch, data: res.data })
             return rejectWithValue(null)
           }
-        } catch (error) {
-          dispatch(changeStatusAC({ status: "failed" }))
+        } catch (error: any) {
+          handleServerNetworkError({ dispatch, error })
           return rejectWithValue(error)
         }
       },
@@ -76,7 +77,7 @@ export const tasksSlice = createAppSlice({
       },
     ),
     updateTask: create.asyncThunk(
-      async (task: DomainTask, thunkAPI) => {
+      async (task: DomainTask, { dispatch, rejectWithValue }) => {
         try {
           const model: UpdateTaskModel = {
             description: task.description,
@@ -86,14 +87,21 @@ export const tasksSlice = createAppSlice({
             status: task.status,
             startDate: task.startDate,
           }
-          thunkAPI.dispatch(changeStatusAC({ status: "loading" }))
+          dispatch(changeStatusAC({ status: "loading" }))
 
-          await tasksApi.updateTask({ task, model })
-          thunkAPI.dispatch(changeStatusAC({ status: "succeeded" }))
-          return task
-        } catch (error) {
-          thunkAPI.dispatch(changeStatusAC({ status: "failed" }))
-          return thunkAPI.rejectWithValue(null)
+          const res = await tasksApi.updateTask({ task, model })
+          dispatch(changeStatusAC({ status: "succeeded" }))
+
+          if (res.data.resultCode === ResultCode.Success) {
+            dispatch(changeStatusAC({ status: "succeeded" }))
+            return res.data.data.item
+          } else {
+            handleServerAppError({ dispatch, data: res.data })
+            return rejectWithValue(null)
+          }
+        } catch (error: any) {
+          handleServerNetworkError({ error, dispatch })
+          return rejectWithValue(null)
         }
       },
       {
